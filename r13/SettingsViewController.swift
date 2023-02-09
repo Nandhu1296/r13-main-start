@@ -1,54 +1,14 @@
-//
-//  SettingsViewController.swift
-//  qw1
-//
-//  Created by PRIYANKA SANKAR on 12/23/22.
-//
-//
-//import UIKit
-//
-//class SettingsViewController: UIViewController {
-//
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//
-//        // Do any additional setup after loading the view.
-//    }
-//
-//
-//    /*
-//    // MARK: - Navigation
-//
-//    // In a storyboard-based application, you will often want to do a little preparation before navigation
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        // Get the new view controller using segue.destination.
-//        // Pass the selected object to the new view controller.
-//    }
-//    */
-//
-//}
-
-//----------
-
-//
-//  SettingsTableController.swift
-//  CityGuide
-//
-//  Created by Studentadm on 9/23/21.
-//
-
 import UIKit
-
-class SettingsViewController: UITableViewController {
+class SettingsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+//class SettingsViewController: UIViewController{
     
 //    let tvc = SettingsViewController()
-    
-//    title = "Settings"
-    
+
+//    tvc.title = "Settings"
 //    navigationController?.pushViewController(tvc, animated: true)
+
+    @IBOutlet weak var tableView: UITableView!
     
-    
-//    public var items: [String] = ["Test Cell 1" , "Default Cell 2"]
     var items = [ "User Category", "Route Preview", "Distance Unit", "Referece Distance Unit", "Orientation Preference" , "Monitoring" , "Step Size (ft)", "Weighted Moving Average", "Set Threshold" , "Timer (Seconds)", "Searching Radius (Meters)" , "GPS Accuracy"]
     var checkmarks: [String : Int] = [
         "User Category" : 0,
@@ -59,7 +19,7 @@ class SettingsViewController: UITableViewController {
     var routePreviwState: Bool = false
     var monitoringState: Bool = false
     var selectedRow : Int = 0
-    
+
     let initialCells = [
         "User Category",
         "Route Preview",
@@ -96,50 +56,71 @@ class SettingsViewController: UITableViewController {
         "Defines the convergance area to search for a destination.",
         "Define how much accuracy is prefered for outdoor navigations. "
     ]
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+//        tableView.delegate = self
+//        tableView.dataSource = self
         overrideUserInterfaceStyle = .light
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+
+//        if tableView != nil {
+//            tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+//        }else{
+//            print("that iiiis nil")
+//        }
         
-        
+//        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+
+
         if let value = UserDefaults.standard.value(forKey: "rPreview") as? Bool{
             routePreviwState = value
         }
-        
+
         if let anotherVal = UserDefaults.standard.value(forKey: "monitoring") as? Bool{
             monitoringState = anotherVal
         }
-        
+
         if let userInputs = UserDefaults.standard.value(forKey: "userInputItems") as? [String : Float]{
             userInputItems = userInputs
         }
-        
+
         if let checks = UserDefaults.standard.value(forKey: "checkmarks") as? [String : Int]{
             checkmarks = checks
         }
-        
-        if checkmarks[self.title!] != nil{
-            selectedRow = checkmarks[self.title!]!
+
+//        if checkmarks[self.title!] != nil{
+//            selectedRow = checkmarks[self.title!]!
+//        }
+
         }
-    }
+    
+//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+//        return 3
+//    }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
+
     }
-    
-    override func numberOfSections(in tableView: UITableView) -> Int {
+
+     func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    
+     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return items.count
     }
-    
+    //    @objc func didChangeSwitch(_ sender: UISwitch){
+    //        if sender.isOn{
+    //            print("user turned it on")
+    //        }
+    //        else{
+    //            print("its now off")
+    //        }
+    //
+    //    }
     @objc func switchChanged(_ sender : UISwitch){
         print("Table row switch changed \(sender.tag)")
         print("The switch is \(sender.isOn ? "ON" : "OFF")")
@@ -152,14 +133,27 @@ class SettingsViewController: UITableViewController {
         UserDefaults.standard.set(routePreviwState, forKey: "rPreview")
         UserDefaults.standard.set(monitoringState, forKey: "monitoring")
     }
+
+//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+//        cell.textLabel?.text = "Hello world"
+//
+//        let mySwitch = UISwitch()
+//        mySwitch.addTarget(self, action: #selector(self.switchChanged(_:)), for: .valueChanged)
+//        mySwitch.isOn = true
+//
+//        cell.accessoryView = mySwitch
+//
+//
+//        return cell
+//    }
     
-    // Initialize and configure the cell
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
+     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        
+
         cell.textLabel?.text = items[indexPath.row]
-        
+
         if(cell.textLabel?.text == "Route Preview" || cell.textLabel?.text == "Monitoring"){
             let switchView = UISwitch(frame: .zero)
             if(cell.textLabel?.text == "Route Preview"){
@@ -172,43 +166,43 @@ class SettingsViewController: UITableViewController {
             switchView.addTarget(self, action: #selector(self.switchChanged(_:)), for: .valueChanged)
             cell.accessoryView = switchView
         }
-        
+
         return cell
     }
     
-    
-    // Selected cell method
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let selectedItem = tableView.cellForRow(at: indexPath)?.textLabel?.text
         let table = SettingsViewController()
-        let userCategory = ["Difficulty Seeing" , "Genral User" , "Difficulty Moving"]
+//         let table = SecondSettings()
+//                 navigationController?.pushViewController(table, animated: true)
+        let userCategory = ["Difficulty Seeing" , "General User" , "Difficulty Moving"]
         let refDistUnit = ["Distance", "Number of Steps"]
         let distUnit = ["Meters" , "Feet"]
         let oriPref = ["Left, Right Method", "Clock Orientation Method"]
-        
-        table.title = selectedItem
-        
+
+//        table.title = selectedItem
+
         if (userCategory.contains(selectedItem!)    ||
             refDistUnit.contains(selectedItem!)     ||
             distUnit.contains(selectedItem!)        ||
             oriPref.contains(selectedItem!)){
-            
+
             for cell in tableView.visibleCells{
                 cell.accessoryType = .none
             }
-            
+
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
             checkmarks[self.title!] = indexPath.row
             UserDefaults.standard.set(checkmarks, forKey: "checkmarks")
         }
-        
+
         var toString : String = ""
         if userInputItems[selectedItem!] != nil{
             toString = String(userInputItems[selectedItem!]!)
         }
-    
-        
+
+
         switch selectedItem {
             case "User Category":
                 table.items = userCategory
@@ -243,14 +237,14 @@ class SettingsViewController: UITableViewController {
             default:
                 break
         }
-        
+
         if (initialCells.contains(selectedItem!)){
             navigationController?.pushViewController(table, animated: true)
         }
 
     }
-    
-    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+
+     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if(cell.textLabel?.text != nil){
             if(initialCells.contains(cell.textLabel?.text ?? "default value") == false){
                 cell.accessoryType = indexPath.row == selectedRow ? .checkmark : .none
@@ -258,8 +252,6 @@ class SettingsViewController: UITableViewController {
         }
     }
     
-    
-    // Alert pop up for userInputItems
     func callAlert(_ title : String, _ message : String, _ defaultVal : String){
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addTextField { (UITextField) in
@@ -276,4 +268,12 @@ class SettingsViewController: UITableViewController {
         self.present(alert, animated: true, completion: nil)
     }
 }
+
+//=======234, 162, 140, 100, 95  - to write override, 91 to 93 is for the title
+
+
+
+
+
+
 
